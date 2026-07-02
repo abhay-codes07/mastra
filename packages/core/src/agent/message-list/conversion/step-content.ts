@@ -32,10 +32,13 @@ export class StepContentExtractor {
   ): AIV5Type.StepResult<any>['content'] {
     const uiMessagesParts = uiMessages.flatMap(item => item.parts);
 
-    // Find step boundaries by looking for step-start markers
+    // Find step boundaries by looking for step-start markers. A leading
+    // step-start (index 0) begins the first step, it is not a separator between
+    // steps, so it must not be counted as a boundary. Otherwise step 1 is read
+    // as empty and every later step number is off by one.
     const stepBoundaries: number[] = [];
     uiMessagesParts.forEach((part, index) => {
-      if (part.type === 'step-start') {
+      if (part.type === 'step-start' && index !== 0) {
         stepBoundaries.push(index);
       }
     });
